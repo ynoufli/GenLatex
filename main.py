@@ -14,10 +14,14 @@ introduction = st.text_area("Introduction *")
 
 st.subheader("Mots-clés")
 motcles = []
+
 for i in range(5):
     col1, col2 = st.columns(2)
     fr = col1.text_input(f"Mot FR {i+1}")
     en = col2.text_input(f"Mot EN {i+1}")
+    if i==0:
+        fr = col1.text_input(f"Mot FR {i+1}*")
+        en = col2.text_input(f"Mot EN {i+1}*")
     if fr and en:
         motcles.append((fr, en))
 

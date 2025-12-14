@@ -43,8 +43,8 @@ for i in range(4):
         titre_ref = st.text_input(f"Titre de l'article {i+1}*")
         url_ref = st.text_input(f"URL {i+1} (optionnel)")
     else:
-        nom = st.text_input(f"Auteur {i+1}*")
-        titre_ref = st.text_input(f"Titre de l'article {i+1}*")
+        nom = st.text_input(f"Auteur {i+1}")
+        titre_ref = st.text_input(f"Titre de l'article {i+1}")
         url_ref = st.text_input(f"URL {i+1} (optionnel)")
     if nom and titre_ref:
         refs.append((nom, titre_ref, url_ref))

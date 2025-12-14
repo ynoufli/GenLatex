@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from urllib.parse import quote
 
-st.info("Veuillez remplir obligatoirement les champs notés avec * afin de générer votre candidature.")
+st.info("Veuillez remplir obligatoirement les champs notés avec * afin de bien générer votre candidature.")
 #st.set_page_config(page_title="Génération de candidature", layout="centered")
 st.title("Génération de candidature")
 

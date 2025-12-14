@@ -30,17 +30,21 @@ explications2 = st.text_area("Explications Partie 2 (optionnel)")
 st.subheader("Plan et exploration interactive")
 exploration = st.text_area("Description du plan *")
 
-st.subheader("Référence principale")
-nom_ref = st.text_input("Auteur *")
-titre_ref = st.text_input("Titre de l'article *")
-url_ref = st.text_input("URL (optionnel)")
+st.subheader("Références")
+refs = []
+for i in range(4):
+    nom = st.text_input(f"Auteur {i+1} *")
+    titre_ref = st.text_input(f"Titre de l'article {i+1} *")
+    url_ref = st.text_input(f"URL {i+1} (optionnel)")
+    if nom and titre_ref:
+        refs.append((nom, titre_ref, url_ref))
 
 # --------------------
 # BOUTON
 # --------------------
 if st.button("Générer le PDF"):
-    if not all([titre, introduction, partie1, explications1, exploration, nom_ref, titre_ref]) or len(motcles) < 2:
-        st.error("Veuillez remplir tous les champs obligatoires (et au moins 2 mots-clés).")
+    if not all([titre, introduction, partie1, explications1, exploration]) or len(motcles) < 2 or len(refs) < 1:
+        st.error("Veuillez remplir tous les champs obligatoires, au moins 2 mots-clés et 1 référence.")
     else:
         # -------- Mots-clés --------
         mots_latex = ""
@@ -51,13 +55,19 @@ if st.button("Générer le PDF"):
         partie2_latex = ""
         if partie2 and explications2:
             partie2_latex = f"""
-\\subsection*{{{partie2}}}
+2. {partie2}
 
 {explications2}
 """
 
-        # -------- URL référence --------
-        url_latex = f"\\url{{{url_ref}}}" if url_ref else ""
+        # -------- Partie 1 numérotée --------
+        partie1_latex = f"1. {partie1}\n\n{explications1}"
+
+        # -------- Références --------
+        refs_latex = ""
+        for nom, titre_ref, url_ref in refs:
+            url_latex = f"\\url{{{url_ref}}}" if url_ref else ""
+            refs_latex += f"\\item {nom}, \\emph{{{titre_ref}}}. {url_latex}\n"
 
         # -------- TEMPLATE FINAL --------
         latex = f"""
@@ -87,9 +97,7 @@ if st.button("Générer le PDF"):
 \\end{{tabular}}
 
 \\section*{{Fondements mathématiques}}
-
-\\subsection*{{{partie1}}}
-{explications1}
+{partie1_latex}
 
 {partie2_latex}
 
@@ -98,8 +106,7 @@ if st.button("Générer le PDF"):
 
 \\section*{{Références}}
 \\begin{{enumerate}}
-\\item {nom_ref}, \\emph{{{titre_ref}}}. {url_latex}
-\\item Acerola, \\emph{{Realistic Ocean Simulation with FFT}}. \\url{{https://www.youtube.com/@Acerola_t}}
+{refs_latex}
 \\end{{enumerate}}
 
 \\end{{document}}

@@ -30,21 +30,21 @@ explications2 = st.text_area("Explications Partie 2 (optionnel)")
 st.subheader("Plan et exploration interactive")
 exploration = st.text_area("Description du plan *")
 
-st.subheader("Références (optionnelles)")
+st.subheader("Références")
 refs = []
 for i in range(4):
-    nom = st.text_input(f"Auteur {i+1} (optionnel)")
-    titre_ref = st.text_input(f"Titre de l'article {i+1} (optionnel)")
+    nom = st.text_input(f"Auteur {i+1} *")
+    titre_ref = st.text_input(f"Titre de l'article {i+1} *")
     url_ref = st.text_input(f"URL {i+1} (optionnel)")
-    if nom or titre_ref or url_ref:
+    if nom and titre_ref:
         refs.append((nom, titre_ref, url_ref))
 
 # --------------------
 # BOUTON
 # --------------------
 if st.button("Générer le PDF"):
-    if not all([titre, introduction, partie1, explications1, exploration]) or len(motcles) < 2:
-        st.error("Veuillez remplir tous les champs obligatoires, au moins 2 mots-clés.")
+    if not all([titre, introduction, partie1, explications1, exploration]) or len(motcles) < 2 or len(refs) < 1:
+        st.error("Veuillez remplir tous les champs obligatoires, au moins 2 mots-clés et 1 référence.")
     else:
         # -------- Mots-clés --------
         mots_latex = ""
@@ -55,20 +55,19 @@ if st.button("Générer le PDF"):
         partie2_latex = ""
         if partie2 and explications2:
             partie2_latex = f"""
-\\textbf{{2. {partie2}}}
+2. {partie2}
 
 {explications2}
 """
 
-        # -------- Partie 1 --------
-        partie1_latex = f"\\textbf{{1. {partie1}}}\n\n{explications1}"
+        # -------- Partie 1 numérotée --------
+        partie1_latex = f"1. {partie1}\n\n{explications1}"
 
         # -------- Références --------
         refs_latex = ""
         for nom, titre_ref, url_ref in refs:
-            if nom or titre_ref or url_ref:
-                url_latex = f"\\url{{{url_ref}}}" if url_ref else ""
-                refs_latex += f"\\item {nom}, \\emph{{{titre_ref}}}. {url_latex}\n"
+            url_latex = f"\\url{{{url_ref}}}" if url_ref else ""
+            refs_latex += f"\\item {nom}, \\emph{{{titre_ref}}}. {url_latex}\n"
 
         # -------- TEMPLATE FINAL --------
         latex = f"""

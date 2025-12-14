@@ -2,127 +2,115 @@ import streamlit as st
 import requests
 from urllib.parse import quote
 
-st.set_page_config(page_title="Génération PDF LaTeX", layout="centered")
-st.title("Génération de candidature (PDF LaTeX)")
+st.title("Génération PDF LaTeX avancée")
 
-# --------------------
-# FORMULAIRE
-# --------------------
-titre = st.text_input("Titre du projet *")
-introduction = st.text_area("Introduction *")
+# --- Formulaire pour remplir les champs ---
+titre = st.text_input("Titre")
+introduction = st.text_area("Introduction")
 
-st.subheader("Mots-clés")
-motcles = []
-for i in range(5):
-    col1, col2 = st.columns(2)
-    fr = col1.text_input(f"Mot FR {i+1}")
-    en = col2.text_input(f"Mot EN {i+1}")
-    if fr and en:
-        motcles.append((fr, en))
+# Mots-clés
+motFR1 = st.text_input("Mot-clé FR 1")
+motANG1 = st.text_input("Mot-clé EN 1")
+motFR2 = st.text_input("Mot-clé FR 2")
+motANG2 = st.text_input("Mot-clé EN 2")
 
-st.subheader("Fondements mathématiques")
-partie1 = st.text_input("Titre Partie 1 *")
-explications1 = st.text_area("Explications Partie 1 *")
-
+# Partie 1 et Partie 2
+partie1 = st.text_input("Titre Partie 1")
+explications1 = st.text_area("Explications Partie 1")
 partie2 = st.text_input("Titre Partie 2 (optionnel)")
 explications2 = st.text_area("Explications Partie 2 (optionnel)")
 
-st.subheader("Plan et exploration interactive")
-exploration = st.text_area("Description du plan *")
-
-st.subheader("Références")
+# Références (toutes optionnelles)
 refs = []
-for i in range(4):
-    nom = st.text_input(f"Auteur {i+1} *")
-    titre_ref = st.text_input(f"Titre de l'article {i+1} *")
-    url_ref = st.text_input(f"URL {i+1} (optionnel)")
-    if nom and titre_ref:
-        refs.append((nom, titre_ref, url_ref))
+for i in range(1, 5):
+    nom = st.text_input(f"Référence {i} - Nom auteur (optionnel)")
+    titre_article = st.text_input(f"Référence {i} - Titre article (optionnel)")
+    url = st.text_input(f"Référence {i} - URL (optionnel)")
+    refs.append((nom, titre_article, url))
 
-# --------------------
-# BOUTON
-# --------------------
-if st.button("Générer le PDF"):
-    if not all([titre, introduction, partie1, explications1, exploration]) or len(motcles) < 2 or len(refs) < 1:
-        st.error("Veuillez remplir tous les champs obligatoires, au moins 2 mots-clés et 1 référence.")
+# Bouton pour générer le PDF
+if st.button("Générer PDF"):
+
+    # Template LaTeX
+    template = r"""
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{margin=2cm}
+
+\title{\textbf{__Titre__}}
+
+\begin{document}
+\date{}
+\maketitle
+
+\section*{Introduction au sujet}
+__Introduction__
+
+\section*{Mots-clés}
+\begin{tabular}{|p{6cm}|p{6cm}|}
+\hline
+\textbf{Mots-clés} & \textbf{Keywords} \\
+\hline
+__MotFR1__ & __MotANG1__ \\
+__MotFR2__ & __MotANG2__ \\
+\hline
+\end{tabular}
+
+\section*{Fondements mathématiques}
+
+__Partie1__
+__Partie2__
+
+\section*{Plan et exploration interactive}
+__exploration__
+
+__RefsSection__
+
+\end{document}
+"""
+
+    # Parties en gras
+    partie1_latex = f"\\textbf{{1. {partie1}}}\n\n{explications1}" if partie1 and explications1 else ""
+    partie2_latex = f"\n\\textbf{{2. {partie2}}}\n\n{explications2}" if partie2 and explications2 else ""
+
+    # Références dynamiques
+    refs_entries = []
+    for nom, titre_article, url in refs:
+        if nom and titre_article:
+            url_text = f"\\url{{{url}}}" if url else ""
+            refs_entries.append(f"{nom}, \\emph{{{titre_article}}} {url_text}")
+    if refs_entries:
+        refs_latex = "\\section*{Références}\n\\begin{enumerate}\n  \\item " + "\n  \\item ".join(refs_entries) + "\n\\end{enumerate}"
     else:
-        # -------- Mots-clés --------
-        mots_latex = ""
-        for fr, en in motcles:
-            mots_latex += f"{fr} & {en} \\\\\n"
+        refs_latex = ""  # Si aucune référence remplie, la section n'apparaît pas
 
-        # -------- Partie 2 --------
-        partie2_latex = ""
-        if partie2 and explications2:
-            partie2_latex = f"""
-2. {partie2}
+    # Remplacer les placeholders
+    latex_text = template.replace("__Titre__", titre)
+    latex_text = latex_text.replace("__Introduction__", introduction)
+    latex_text = latex_text.replace("__MotFR1__", motFR1)
+    latex_text = latex_text.replace("__MotANG1__", motANG1)
+    latex_text = latex_text.replace("__MotFR2__", motFR2)
+    latex_text = latex_text.replace("__MotANG2__", motANG2)
+    latex_text = latex_text.replace("__Partie1__", partie1_latex)
+    latex_text = latex_text.replace("__Partie2__", partie2_latex)
+    latex_text = latex_text.replace("__RefsSection__", refs_latex)
+    latex_text = latex_text.replace("__exploration__", "À remplir par l'utilisateur")
 
-{explications2}
-"""
+    # --- Appel de l'API LaTeX ---
+    encoded = quote(latex_text)
+    url = f"https://latexonline.cc/compile?text={encoded}"
 
-        # -------- Partie 1 numérotée --------
-        partie1_latex = f"1. {partie1}\n\n{explications1}"
-
-        # -------- Références --------
-        refs_latex = ""
-        for nom, titre_ref, url_ref in refs:
-            url_latex = f"\\url{{{url_ref}}}" if url_ref else ""
-            refs_latex += f"\\item {nom}, \\emph{{{titre_ref}}}. {url_latex}\n"
-
-        # -------- TEMPLATE FINAL --------
-        latex = f"""
-\\documentclass[a4paper,12pt]{{article}}
-\\usepackage[utf8]{{inputenc}}
-\\usepackage[T1]{{fontenc}}
-\\usepackage{{geometry}}
-\\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue]{{hyperref}}
-\\geometry{{margin=2cm}}
-
-\\title{{\\textbf{{{titre}}}}}
-
-\\begin{{document}}
-\\date{{}}
-\\maketitle
-
-\\section*{{Introduction au sujet}}
-{introduction}
-
-\\section*{{Mots-clés}}
-\\begin{{tabular}}{{|p{{6cm}}|p{{6cm}}|}}
-\\hline
-\\textbf{{Mots-clés}} & \\textbf{{Keywords}} \\\\
-\\hline
-{mots_latex}
-\\hline
-\\end{{tabular}}
-
-\\section*{{Fondements mathématiques}}
-{partie1_latex}
-
-{partie2_latex}
-
-\\section*{{Plan et exploration interactive}}
-{exploration}
-
-\\section*{{Références}}
-\\begin{{enumerate}}
-{refs_latex}
-\\end{{enumerate}}
-
-\\end{{document}}
-"""
-
-        encoded = quote(latex)
-        url = f"https://latexonline.cc/compile?text={encoded}"
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            st.success("PDF généré avec succès")
-            st.download_button(
-                "Télécharger le PDF",
-                response.content,
-                file_name="candidature.pdf",
-                mime="application/pdf"
-            )
-        else:
-            st.error("Erreur lors de la génération du PDF")
+    response = requests.get(url)
+    if response.status_code == 200:
+        st.success("PDF généré avec succès !")
+        st.download_button(
+            label="Télécharger le PDF",
+            data=response.content,
+            file_name="candidature.pdf",
+            mime="application/pdf"
+        )
+    else:
+        st.error("Erreur lors de la génération du PDF")

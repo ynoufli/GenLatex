@@ -14,9 +14,14 @@ introduction = st.text_area("Introduction *")
 st.subheader("Mots-clés")
 motcles = []
 for i in range(5):
-    col1, col2 = st.columns(2)
-    fr = col1.text_input(f"Mot FR {i+1}")
-    en = col2.text_input(f"Mot EN {i+1}")
+    if i == 0 or i==1:
+        col1, col2 = st.columns(2)
+        fr = col1.text_input(f"Mot FR {i+1}*")
+        en = col2.text_input(f"Mot EN {i+1}*")
+    else:
+        col1, col2 = st.columns(2)
+        fr = col1.text_input(f"Mot FR {i+1}")
+        en = col2.text_input(f"Mot EN {i+1}")
     if fr and en:
         motcles.append((fr, en))
 
@@ -33,9 +38,14 @@ exploration = st.text_area("Description du plan *")
 st.subheader("Références")
 refs = []
 for i in range(4):
-    nom = st.text_input(f"Auteur {i+1}")
-    titre_ref = st.text_input(f"Titre de l'article {i+1}")
-    url_ref = st.text_input(f"URL {i+1} (optionnel)")
+    if i==0:
+        nom = st.text_input(f"Auteur {i+1}*")
+        titre_ref = st.text_input(f"Titre de l'article {i+1}*")
+        url_ref = st.text_input(f"URL {i+1} (optionnel)")
+    else:
+        nom = st.text_input(f"Auteur {i+1}*")
+        titre_ref = st.text_input(f"Titre de l'article {i+1}*")
+        url_ref = st.text_input(f"URL {i+1} (optionnel)")
     if nom and titre_ref:
         refs.append((nom, titre_ref, url_ref))
 

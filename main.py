@@ -66,7 +66,7 @@ if st.button("Générer le PDF"):
         partie2_latex = ""
         if partie2 and explications2:
             partie2_latex = f"\n\\textbf{{2. {partie2}}}\n\n{explications2}"
-            2. {partie2}
+2. {partie2}
 
 {explications2}
 """

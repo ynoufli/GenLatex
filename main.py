@@ -3,7 +3,6 @@ import requests
 from urllib.parse import quote
 
 st.info("Veuillez remplir obligatoirement les champs notés avec * afin de bien générer votre candidature.")
-#st.set_page_config(page_title="Génération de candidature", layout="centered")
 st.title("Génération de candidature")
 
 # --------------------
@@ -34,8 +33,8 @@ exploration = st.text_area("Description du plan *")
 st.subheader("Références")
 refs = []
 for i in range(4):
-    nom = st.text_input(f"Auteur {i+1} *")
-    titre_ref = st.text_input(f"Titre de l'article {i+1} *")
+    nom = st.text_input(f"Auteur {i+1}")
+    titre_ref = st.text_input(f"Titre de l'article {i+1}")
     url_ref = st.text_input(f"URL {i+1} (optionnel)")
     if nom and titre_ref:
         refs.append((nom, titre_ref, url_ref))
@@ -44,25 +43,21 @@ for i in range(4):
 # BOUTON
 # --------------------
 if st.button("Générer le PDF"):
-    if not all([titre, introduction, partie1, explications1, exploration]) or len(motcles) < 2 or len(refs) < 1:
-        st.error("Veuillez remplir tous les champs obligatoires, au moins 2 mots-clés et 1 référence.")
+    if not all([titre, introduction, partie1, explications1, exploration]) or len(motcles) < 2:
+        st.error("Veuillez remplir tous les champs obligatoires, au moins 2 mots-clés.")
     else:
         # -------- Mots-clés --------
         mots_latex = ""
         for fr, en in motcles:
             mots_latex += f"{fr} & {en} \\\\\n"
 
-        # -------- Partie 2 --------
+        # -------- Partie 1 numérotée en gras --------
+        partie1_latex = f"\\noindent\\textbf{{1. {partie1}}}\n\n{explications1}\n"
+
+        # -------- Partie 2 (optionnelle) numérotée en gras --------
         partie2_latex = ""
         if partie2 and explications2:
-            partie2_latex = f"""
-2. {partie2}
-
-{explications2}
-"""
-
-        # -------- Partie 1 numérotée --------
-        partie1_latex = f"1. {partie1}\n\n{explications1}"
+            partie2_latex = f"\\noindent\\textbf{{2. {partie2}}}\n\n{explications2}\n"
 
         # -------- Références --------
         refs_latex = ""
@@ -99,7 +94,6 @@ if st.button("Générer le PDF"):
 
 \\section*{{Fondements mathématiques}}
 {partie1_latex}
-
 {partie2_latex}
 
 \\section*{{Plan et exploration interactive}}

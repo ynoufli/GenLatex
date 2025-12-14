@@ -8,7 +8,7 @@ st.title("Génération de candidature")
 # --------------------
 # FORMULAIRE
 # --------------------
-titre = st.text_input("Titre du sujet *")
+titre = st.text_input("Intitulé du sujet *")
 introduction = st.text_area("Introduction *")
 
 st.subheader("Mots-clés")
@@ -26,14 +26,14 @@ for i in range(5):
         motcles.append((fr, en))
 
 st.subheader("Fondements mathématiques")
-partie1 = st.text_input("Titre de la partie 1 *")
-explications1 = st.text_area("Explications Partie 1 *")
+partie1 = st.text_input("Intitulé de la partie 1 *")
+explications1 = st.text_area("Brève explication des concepts mathématiques abordés *")
 
-partie2 = st.text_input("Titre de la partie 2 (optionnel)")
-explications2 = st.text_area("Explications Partie 2 (optionnel)")
+partie2 = st.text_input("Intitulé de la partie 2 (optionnel)")
+explications2 = st.text_area("Brève explication des concepts mathématiques abordés (optionnel)")
 
 st.subheader("Plan et exploration interactive")
-exploration = st.text_area("Description du plan *")
+exploration = st.text_area("Description du plan d'animation *")
 
 st.subheader("Références")
 refs = []

@@ -65,14 +65,14 @@ if st.button("Générer le PDF"):
         # -------- Partie 2 --------
         partie2_latex = ""
         if partie2 and explications2:
-            partie2_latex = f"\n\\textbf{{2. {partie2}}}\n\n{explications2}"
+            partie2_latex = f"""
 2. {partie2}
 
 {explications2}
 """
 
         # -------- Partie 1 numérotée --------
-        partie1_latex = f"\\textbf{{1. {partie1}}}\n\n{explications1}"
+        partie1_latex = f"1. {partie1}\n\n{explications1}"
 
         # -------- Références --------
         refs_latex = ""

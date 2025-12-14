@@ -2,13 +2,14 @@ import streamlit as st
 import requests
 from urllib.parse import quote
 
-st.set_page_config(page_title="Génération PDF LaTeX", layout="centered")
+st.info("Veuillez remplir obligatoirement les champs notés avec * afin de générer votre candidature.")
+st.set_page_config(page_title="Génération de candidature", layout="centered")
 st.title("Génération de candidature (PDF LaTeX)")
 
 # --------------------
 # FORMULAIRE
 # --------------------
-titre = st.text_input("Titre du projet *")
+titre = st.text_input("Titre du sujet *")
 introduction = st.text_area("Introduction *")
 
 st.subheader("Mots-clés")
@@ -21,10 +22,10 @@ for i in range(5):
         motcles.append((fr, en))
 
 st.subheader("Fondements mathématiques")
-partie1 = st.text_input("Titre Partie 1 *")
+partie1 = st.text_input("Titre de la partie 1 *")
 explications1 = st.text_area("Explications Partie 1 *")
 
-partie2 = st.text_input("Titre Partie 2 (optionnel)")
+partie2 = st.text_input("Titre de la partie 2 (optionnel)")
 explications2 = st.text_area("Explications Partie 2 (optionnel)")
 
 st.subheader("Plan et exploration interactive")
